@@ -45,13 +45,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-    Side computer_side = BLACK;
-    if (player_side == BLACK)
+    Side opponent_side = BLACK;
+    if (player_side == BLACK) //Sets computer color
     {
-		computer_side = WHITE;
+		opponent_side = WHITE;
 	}
 	
-	board->doMove(opponentsMove, computer_side);
+	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
 	
 	for(int y = 0; y < 8; y++)
 	{
