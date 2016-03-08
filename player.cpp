@@ -40,11 +40,15 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return NULL.
  */
+ 
+ 
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /* 
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
+    int score = -1000;
+    Move *best_move;
     Side opponent_side = BLACK;
     if (player_side == BLACK) //Sets computer color
     {
@@ -60,13 +64,28 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 			Move *move = new Move(x,y);
 			if(board->checkMove(move, player_side))
 			{
-				cerr << x << " " << y <<endl;
-				board->doMove(move, player_side);
-				return move;
+				Board *temp = board->copy();
+				temp -> doMove(move, player_side);
+				if (temp-> count(player_side) - temp -> count(opponent_side) > score)
+				{
+					best_move = move;
+					score = temp->count(player_side) - temp->count(opponent_side);
+					delete temp;
+				}
+				else
+				{
+					delete move;
+					delete temp;
+				}
 			}
 		}
 	}
 	
+	if (score != -1000)
+	{
+		board->doMove(best_move, player_side);
+		return best_move;
+	}
      
     return NULL;
 }
