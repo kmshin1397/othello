@@ -52,6 +52,7 @@ vector<Move *> Player::validMoves(Board *input_board, Side side) {
 	return result;
 }
 
+<<<<<<< HEAD
 // 2-ply minimax
 int min_gain;
 int max_min;
@@ -91,8 +92,26 @@ for (int i = 0; i < min_gains.size(); i++)
 		best_move = i;
 	}
 }
+//validMoves1[i];
+=======
+int Player::compute_score(Board *input_board, Side side, Move *move)
+{
+	int score = 0;
+	Board *temp = input_board->copy();
+	temp -> doMove(move, side);
+	if(side == BLACK)
+	{
+		score = temp->countBlack() - temp->countWhite();
+	}
+	else
+	{
+		score = temp->countWhite() - temp->countBlack();
+	}
+	delete temp;
+	return score;
+}
 
-return validMoves1[i];
+>>>>>>> ab85eed2c506317c04c09f8f05bad44a54106af9
 
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -113,7 +132,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-    int score = -1000;
+    int best_score = -1000;
     Move *best_move = NULL;
     Side opponent_side = BLACK;
     if (player_side == BLACK) //Sets computer color
@@ -129,23 +148,21 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	{	
 		if(board->checkMove(moves[i], player_side))
 		{
-			Board *temp = board->copy();
-			temp -> doMove(moves[i], player_side);
-			if (temp-> count(player_side) - temp -> count(opponent_side) > score)
+			int score = compute_score(board, player_side, moves[i]);
+			if (score > best_score)
 			{
 				delete best_move;
 				best_move = moves[i];
-				score = temp->count(player_side) - temp->count(opponent_side);
+				best_score = score;
 			}
 			else
 			{
 				delete moves[i];
 			}
-			delete temp;
 		}
 	}
 	
-	if (score != -1000)
+	if (best_score != -1000)
 	{
 		board->doMove(best_move, player_side);
 		return best_move;
