@@ -23,7 +23,7 @@ public:
 	
 	int compute_score(Board *input_board, Side side, Move *move);
 	
-	Move *\minimax(Board *input_board, Side player_side);
+	Move *minimax();
 	
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
