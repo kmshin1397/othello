@@ -19,7 +19,7 @@ public:
     
     Move *doMove(Move *opponentsMove, int msLeft);
 
-	vector<Move *> validMoves(Board board, Side side);
+	vector<Move *> validMoves(Board *board, Side side);
 	
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
