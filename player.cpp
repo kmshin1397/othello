@@ -110,21 +110,21 @@ int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
 	}
 	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
 	{
-		score += 5;	
+		score -= 5;	
 	}
-	/*else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
 		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
 	{
-		score -= 2;
+		score += 2;
 	}
 	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
 	{
-		score -= 4;	
+		score += 4;	
 	}
 	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
 	{
-		score += 2;
-	}*/
+		score -= 2;
+	}
 	
 	delete temp;
 	return score;
@@ -262,9 +262,8 @@ Move *Player::minimax()
 		opponent_side = WHITE;
 	}	
 	// 2-ply minimax
-	int min_gain = 9999999;
 	int max_min;
-	int best_move = 0;
+	unsigned int best_move = 0;
 
 	vector <int> min_gains;
 
@@ -272,7 +271,7 @@ Move *Player::minimax()
 	vector <Move *> validMoves1 = validMoves(board, player_side);
 	for (unsigned int i = 0; i < validMoves1.size(); i++)
 	{
-
+		int min_gain = 9999999;
 		Board *temp = board->copy();
 		temp->doMove(validMoves1[i], player_side);
 		
@@ -285,7 +284,6 @@ Move *Player::minimax()
 			if(testingMinimax)
 			{
 				score = -1*simple_score(temp, opponent_side, validMoves2[j]) ;
-				cerr << score << endl;
 			}
 			else
 			{
@@ -295,6 +293,7 @@ Move *Player::minimax()
 			{
 				min_gain = score;
 			}
+			delete validMoves2[j];
 		}
 		// Record minimum gain of each branch
 		min_gains.push_back(min_gain);
@@ -304,12 +303,22 @@ Move *Player::minimax()
 
 	// Find maximum min gain
 	max_min = min_gains[0];
-	for (unsigned int i = 0; i < min_gains.size(); i++)
+
+	for (unsigned int l = 0; l < min_gains.size(); l++)
 	{
-		if (min_gains[i] > max_min)
+
+		if (min_gains[l] > max_min)
 		{
-			max_min = min_gains[i];
-			best_move = i;
+			max_min = min_gains[l];
+			best_move = l;
+		}
+	}
+	
+	for (unsigned int i = 0; i < validMoves1.size(); i++)
+	{
+		if (i != best_move)
+		{
+			delete validMoves1[i];
 		}
 	}
 	return validMoves1[best_move];
