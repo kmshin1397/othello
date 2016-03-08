@@ -29,6 +29,30 @@ Player::~Player() {
 }
 
 /*
+ * Checks for valid moves and returns a vector of pointers to those valid
+ * moves.
+ * 
+ * param: current Board board
+ * param: Side side of player whose turn it is
+ */
+vector<Move *> Player::validMoves(Board board, Side side) {
+	vector<Move *> result;
+	for(int y = 0; y < 8; y++)
+	{
+		for(int x = 0; x < 8; x++)
+		{
+			Move *move = new Move(x,y);
+			if(board->checkMove(move, player_side))
+			{
+				result.push_back(move);
+			}
+		}
+	}
+	return result;
+}
+
+
+/*
  * Compute the next move given the opponent's last move. Your AI is
  * expected to keep track of the board on its own. If this is the first move,
  * or if the opponent passed on the last move, then opponentsMove will be NULL.

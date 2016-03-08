@@ -4,6 +4,8 @@
 #include <iostream>
 #include "common.h"
 #include "board.h"
+#include <vector>
+
 using namespace std;
 
 class Player {
@@ -17,6 +19,8 @@ public:
     
     Move *doMove(Move *opponentsMove, int msLeft);
 
+	vector<Move *> validMoves(Board board, Side side);
+	
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 };
