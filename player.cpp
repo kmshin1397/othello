@@ -53,19 +53,46 @@ vector<Move *> Player::validMoves(Board *input_board, Side side) {
 }
 
 // 2-ply minimax
-int worst_score;
-int best_score;
+int min_gain;
+int max_min;
+int best_move = 0;
+
+vector <int> min_gains;
+
+//for every valid move
 vector <Move *> validMoves1 = validMoves(board, side);
 for (int i = 0; i < validMoves1.size(); i++)
 {
 	Board *temp = board->copy();
-	vector <Move *> validMoves2 = validMoves(temp, side);
-	for (int i = 0; i < validMoves2.size(); i++)
-	{
-		temp->doMove(, side);
-		//check score
 	
+	//for every valid move from valid move
+	vector <Move *> validMoves2 = validMoves(temp, side);
+	for (int j = 0; j < validMoves2.size(); j++)
+	{
+		temp->doMove(validMoves2[j],side);
+		//check score
+		int score = checkscore;
+		if (score < min_gain)
+		{
+			min_gain = score;
+		}
+	}
+	// Record minimum gain of each branch
+	min_gains.push_back(min_gain);
+}
 
+// Find maximum min gain
+max_min = min_gains[0];
+for (int i = 0; i < min_gains.size(); i++)
+{
+	if (min_gains[i] > max_min)
+	{
+		max_min = min_gains[i];
+		best_move = i;
+	}
+}
+
+return validMoves1[i];
 
 /*
  * Compute the next move given the opponent's last move. Your AI is
