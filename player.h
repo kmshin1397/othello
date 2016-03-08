@@ -22,6 +22,7 @@ public:
 	vector<Move *> validMoves(Board *board, Side side);
 	
 	int compute_score(Board *input_board, Side side, Move *move);
+	int simple_score(Board *input_board, Side side, Move *move);
 	
 	Move *minimax();
 	
