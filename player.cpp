@@ -26,6 +26,7 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
+	delete board;
 }
 
 /*
@@ -82,6 +83,49 @@ int Player::compute_score(Board *input_board, Side side, Move *move)
 	return score;
 }
 
+Move *Player::minimax(Board *input_board, Side player_side)
+{
+	// 2-ply minimax
+	int min_gain;
+	int max_min;
+	int best_move = 0;
+
+	vector <int> min_gains;
+
+	//for every valid move
+	vector <Move *> validMoves1 = validMoves(input_board, player_side);
+	for (int i = 0; i < validMoves1.size(); i++)
+	{
+		Board *temp = input_board->copy();
+		temp->doMove(validMoves1[i], player_side);
+		
+		//for every valid move from valid move
+		vector <Move *> validMoves2 = validMoves(temp, player_side);
+		for (int j = 0; j < validMoves2.size(); j++)
+		{
+			//check score
+			int score = compute_score(temp, player_side, validMoves2[j]) ;
+			if (score < min_gain)
+			{
+				min_gain = score;
+			}
+		}
+		// Record minimum gain of each branch
+		min_gains.push_back(min_gain);
+	}
+
+	// Find maximum min gain
+	max_min = min_gains[0];
+	for (int i = 0; i < min_gains.size(); i++)
+	{
+		if (min_gains[i] > max_min)
+		{
+			max_min = min_gains[i];
+			best_move = i;
+		}
+	}
+	return validMoves1[i];
+}
 
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -140,3 +184,4 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      
     return NULL;
 }
+
