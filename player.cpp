@@ -54,7 +54,7 @@ vector<Move *> Player::validMoves(Board *input_board, Side side) {
 	return result;
 }
 
-int Player::compute_score(Board *input_board, Side side, Move *move)
+int Player::compute_score(Board *input_board, Side side, Move *move) //original compute score function keeping temporarily for reference
 {
 	int score = 0;
 	Board *temp = input_board->copy();
@@ -90,7 +90,7 @@ int Player::compute_score(Board *input_board, Side side, Move *move)
 }
 
 
-int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
+int Player::compute_score_ply2(Board *input_board, Side side, Move *move) //current function being used with minimax
 {
 	int score = 0;
 	Side opponent_side = BLACK;
@@ -108,20 +108,20 @@ int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
 	{
 		score = temp->countWhite() - temp->countBlack();
 	}
-	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
+	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7)) // corners
 	{
 		score -= 5;	
 	}
-	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6)) //adjacent to corners
 		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
 	{
 		score += 2;
 	}
-	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
+	else if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6)) //diagonal to corners
 	{
 		score += 4;	
 	}
-	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
+	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7)) //edges
 	{
 		score -= 2;
 	}
@@ -131,7 +131,7 @@ int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
 }
 
 
-int Player::compute_score2(Board *input_board, Side player_side, Move *move)
+int Player::compute_score2(Board *input_board, Side player_side, Move *move) //new function being implemented for score, still in progress
 {
 	int score = 0;
 	Board *temp = input_board->copy();
@@ -232,7 +232,7 @@ int Player::compute_score2(Board *input_board, Side player_side, Move *move)
 
 
 
-int Player::simple_score(Board *input_board, Side side, Move *move)
+int Player::simple_score(Board *input_board, Side side, Move *move) //made for testing minimax
 {
 	int score = 0;
 	
@@ -256,12 +256,13 @@ int Player::simple_score(Board *input_board, Side side, Move *move)
 
 Move *Player::minimax()
 {
+	// 2-ply minimax
 	Side opponent_side = BLACK;
 	if (player_side == BLACK) //Sets computer color
 	{
 		opponent_side = WHITE;
 	}	
-	// 2-ply minimax
+	
 	int max_min;
 	unsigned int best_move = 0;
 
@@ -343,7 +344,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-	if(using_minimax || testingMinimax)
+	if(using_minimax || testingMinimax) //to use with minimax
 	{
 		Move *best_move = NULL;
 		Side opponent_side = BLACK;
@@ -365,7 +366,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		board->doMove(best_move, player_side);
 		return best_move;
 	}
-	else
+	else //in case we want to test our function without minimax/ply-2
 	{
 		int best_score = -10000000;
 		Move *best_move = NULL;
