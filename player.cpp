@@ -15,7 +15,9 @@ Player::Player(Side side) {
     player_side = side;
 	Board *new_board = new Board();
 	board = new_board;
+	using_minimax = true;
     /* 
+     * 
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
@@ -67,27 +69,37 @@ int Player::compute_score(Board *input_board, Side side, Move *move)
 	}
 	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
 	{
-		score += 10;
+		score += 5;	
 	}
-	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
-		||  ((move->getY() == 0 || move->getY() == 0) && (move->getX() == 1 || move->getX() == 6)))
+	/*else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
 	{
-		score -= 4;
+		score -= 2;
+	}
+	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
+	{
+		score -= 4;	
 	}
 	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
 	{
 		score += 2;
-	}
+	}*/
 	
 	delete temp;
 	return score;
 }
 
-int Player::simple_score(Board *input_board, Side side, Move *move)
+
+int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
 {
 	int score = 0;
+	Side opponent_side = BLACK;
+	if (side == BLACK) //Sets computer color
+	{
+		opponent_side = WHITE;
+	}	
 	Board *temp = input_board->copy();
-	temp -> doMove(move, side);
+	temp -> doMove(move, opponent_side);
 	if(side == BLACK)
 	{
 		score = temp->countBlack() - temp->countWhite();
@@ -98,8 +110,144 @@ int Player::simple_score(Board *input_board, Side side, Move *move)
 	}
 	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
 	{
-		score += 5;
+		score += 5;	
 	}
+	/*else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
+	{
+		score -= 2;
+	}
+	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
+	{
+		score -= 4;	
+	}
+	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
+	{
+		score += 2;
+	}*/
+	
+	delete temp;
+	return score;
+}
+
+
+int Player::compute_score2(Board *input_board, Side player_side, Move *move)
+{
+	int score = 0;
+	Board *temp = input_board->copy();
+	temp -> doMove(move, player_side);
+	Side opp_side;
+	
+	if(player_side == BLACK)
+	{
+		opp_side = WHITE;
+		score = temp->countBlack() - temp->countWhite();
+	}
+	else
+	{
+		opp_side = BLACK;
+		score = temp->countWhite() - temp->countBlack();
+	}
+	
+	
+	double piece_diff;
+	if(temp->count(player_side) > temp->count(opp_side))
+	{
+		piece_diff = 100.0 * double(temp->count(player_side))/(temp->count(player_side) + temp->count(opp_side));
+	}
+	else if(temp->count(player_side) == temp->count(opp_side))
+	{
+		piece_diff = 0.0;
+	}
+	else
+	{
+		piece_diff = -100.0 * double(temp->count(opp_side))/(temp->count(player_side) + temp->count(opp_side));
+	}
+	
+	
+	double corner_occ;
+	int player_corner = 0;
+	int opp_corner = 0;
+	if (temp->get(player_side, 0, 0))
+	{
+		player_corner++;
+	}
+	else if (temp->get(opp_side, 0, 0))
+	{
+		opp_corner++;
+	}
+	if (temp->get(player_side, 0, 7))
+	{
+		player_corner++;
+	}
+	else if (temp->get(opp_side, 0, 7))
+	{
+		opp_corner++;
+	}
+	if (temp->get(player_side, 7, 0))
+	{
+		player_corner++;
+	}
+	else if (temp->get(opp_side, 7, 0))
+	{
+		opp_corner++;
+	}
+	if (temp->get(player_side, 7, 7))
+	{
+		player_corner++;
+	}
+	else if (temp->get(opp_side, 7, 7))
+	{
+		opp_corner++;
+	}
+	corner_occ = 25.0 * player_corner - 25 * opp_corner;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
+	{
+		score += 10;
+	}
+	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+		||  ((move->getY() == 0 || move->getY() == 0) && (move->getX() == 1 || move->getX() == 6)))
+	{
+		score -= 4;
+	}
+	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
+	{
+		score += 2;
+	}*/
+	
+	score = 10 * piece_diff + 801.724 * corner_occ;
+	delete temp;
+	return score;
+}
+
+
+
+int Player::simple_score(Board *input_board, Side side, Move *move)
+{
+	int score = 0;
+	
+	Board *temp = input_board->copy();
+	temp->doMove(move, side);
+	if(side == BLACK)
+	{
+		score = temp->countBlack() - temp->countWhite();
+		
+	}
+	else
+	{
+		score = temp->countWhite() - temp->countBlack();
+	}
+	
 	
 	delete temp;
 	return score;
@@ -108,8 +256,13 @@ int Player::simple_score(Board *input_board, Side side, Move *move)
 
 Move *Player::minimax()
 {
+	Side opponent_side = BLACK;
+	if (player_side == BLACK) //Sets computer color
+	{
+		opponent_side = WHITE;
+	}	
 	// 2-ply minimax
-	int min_gain;
+	int min_gain = 9999999;
 	int max_min;
 	int best_move = 0;
 
@@ -124,18 +277,19 @@ Move *Player::minimax()
 		temp->doMove(validMoves1[i], player_side);
 		
 		//for every valid move from valid move
-		vector <Move *> validMoves2 = validMoves(temp, player_side);
+		vector <Move *> validMoves2 = validMoves(temp, opponent_side);
 		for (unsigned int j = 0; j < validMoves2.size(); j++)
 		{
 			//check score
 			int score;
 			if(testingMinimax)
 			{
-				score = simple_score(temp, player_side, validMoves2[j]) ;
+				score = -1*simple_score(temp, opponent_side, validMoves2[j]) ;
+				cerr << score << endl;
 			}
 			else
 			{
-				score = compute_score(temp, player_side, validMoves2[j]) ;
+				score = compute_score_ply2(temp, player_side, validMoves2[j]) ;
 			}
 			if (score < min_gain)
 			{
@@ -144,6 +298,8 @@ Move *Player::minimax()
 		}
 		// Record minimum gain of each branch
 		min_gains.push_back(min_gain);
+		
+		delete temp;
 	}
 
 	// Find maximum min gain
@@ -178,6 +334,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
+	if(using_minimax || testingMinimax)
+	{
 		Move *best_move = NULL;
 		Side opponent_side = BLACK;
 		if (player_side == BLACK) //Sets computer color
@@ -197,5 +355,46 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		
 		board->doMove(best_move, player_side);
 		return best_move;
+	}
+	else
+	{
+		int best_score = -10000000;
+		Move *best_move = NULL;
+		Side opponent_side = BLACK;
+		if (player_side == BLACK) //Sets computer color
+		{
+			opponent_side = WHITE;
+		}		
+		board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
+		
+		vector<Move *> moves = validMoves(board, player_side);
+		
+		for(unsigned int i = 0; i < moves.size(); i++)
+		{
+			if(board->checkMove(moves[i], player_side))
+			{
+				int score = compute_score2(board, player_side, moves[i]);
+				if (score > best_score)
+				{
+					delete best_move;
+					best_move = moves[i];
+					best_score = score;
+				}
+				else
+				{
+					delete moves[i];
+				}
+			
+			}
+		}
+		
+		if (best_score != -10000000)
+		{
+			board->doMove(best_move, player_side);
+			return best_move;
+		}
+		
+		return NULL;
+	}
 }
 
