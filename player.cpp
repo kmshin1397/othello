@@ -64,6 +64,20 @@ int Player::compute_score(Board *input_board, Side side, Move *move)
 	{
 		score = temp->countWhite() - temp->countBlack();
 	}
+	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
+	{
+		score += 5;
+	}
+	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
+		||  ((move->getY() == 0 || move->getY() == 0) && (move->getX() == 1 || move->getY() == 6)))
+	{
+		score -= 2;
+	}
+	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
+	{
+		score += 2;
+	}
+	
 	delete temp;
 	return score;
 }
@@ -94,7 +108,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     if (player_side == BLACK) //Sets computer color
     {
 		opponent_side = WHITE;
-	}
+	}		
 	
 	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
 	
