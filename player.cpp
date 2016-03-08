@@ -69,7 +69,7 @@ int Player::compute_score(Board *input_board, Side side, Move *move)
 	return score;
 }
 
-Move *Player::minimax(Board *input_board, Side player_side)
+Move *Player::minimax()
 {
 	// 2-ply minimax
 	int min_gain;
@@ -79,15 +79,16 @@ Move *Player::minimax(Board *input_board, Side player_side)
 	vector <int> min_gains;
 
 	//for every valid move
-	vector <Move *> validMoves1 = validMoves(input_board, player_side);
-	for (int i = 0; i < validMoves1.size(); i++)
+	vector <Move *> validMoves1 = validMoves(board, player_side);
+	for (unsigned int i = 0; i < validMoves1.size(); i++)
 	{
-		Board *temp = input_board->copy();
+
+		Board *temp = board->copy();
 		temp->doMove(validMoves1[i], player_side);
 		
 		//for every valid move from valid move
 		vector <Move *> validMoves2 = validMoves(temp, player_side);
-		for (int j = 0; j < validMoves2.size(); j++)
+		for (unsigned int j = 0; j < validMoves2.size(); j++)
 		{
 			//check score
 			int score = compute_score(temp, player_side, validMoves2[j]) ;
@@ -102,7 +103,7 @@ Move *Player::minimax(Board *input_board, Side player_side)
 
 	// Find maximum min gain
 	max_min = min_gains[0];
-	for (int i = 0; i < min_gains.size(); i++)
+	for (unsigned int i = 0; i < min_gains.size(); i++)
 	{
 		if (min_gains[i] > max_min)
 		{
@@ -110,7 +111,7 @@ Move *Player::minimax(Board *input_board, Side player_side)
 			best_move = i;
 		}
 	}
-	return validMoves1[i];
+	return validMoves1[best_move];
 }
 
 /*
@@ -132,7 +133,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-    int best_score = -1000;
+    
     Move *best_move = NULL;
     Side opponent_side = BLACK;
     if (player_side == BLACK) //Sets computer color
@@ -143,31 +144,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
 	
 	vector<Move *> moves = validMoves(board, player_side);
-	
-	for(unsigned int i = 0; i < moves.size(); i++)
-	{	
-		if(board->checkMove(moves[i], player_side))
-		{
-			int score = compute_score(board, player_side, moves[i]);
-			if (score > best_score)
-			{
-				delete best_move;
-				best_move = moves[i];
-				best_score = score;
-			}
-			else
-			{
-				delete moves[i];
-			}
-		}
-	}
-	
-	if (best_score != -1000)
+	if (moves.size() == 0)
 	{
-		board->doMove(best_move, player_side);
-		return best_move;
+		return NULL;
 	}
-     
-    return NULL;
+	
+	best_move = minimax();
+    
+    board->doMove(best_move, player_side);
+	return best_move;
 }
 
