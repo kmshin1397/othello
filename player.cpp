@@ -110,7 +110,7 @@ int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
 	}
 	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
 	{
-		score += 5;	
+		score -= 5;	
 	}
 	/*else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
 		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
@@ -285,7 +285,6 @@ Move *Player::minimax()
 			if(testingMinimax)
 			{
 				score = -1*simple_score(temp, opponent_side, validMoves2[j]) ;
-				cerr << score << endl;
 			}
 			else
 			{
