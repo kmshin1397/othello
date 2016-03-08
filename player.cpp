@@ -36,14 +36,14 @@ Player::~Player() {
  * param: current Board board
  * param: Side side of player whose turn it is
  */
-vector<Move *> Player::validMoves(Board board, Side side) {
+vector<Move *> Player::validMoves(Board *input_board, Side side) {
 	vector<Move *> result;
 	for(int y = 0; y < 8; y++)
 	{
 		for(int x = 0; x < 8; x++)
 		{
 			Move *move = new Move(x,y);
-			if(board.checkMove(move, side))
+			if(input_board->checkMove(move, side))
 			{
 				result.push_back(move);
 			}
@@ -87,7 +87,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     int score = -1000;
-    Move *best_move;
+    Move *best_move = NULL;
     Side opponent_side = BLACK;
     if (player_side == BLACK) //Sets computer color
     {
@@ -96,27 +96,25 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	
 	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
 	
-	for(int y = 0; y < 8; y++)
-	{
-		for(int x = 0; x < 8; x++)
+	vector<Move *> moves = validMoves(board, player_side);
+	
+	for(unsigned int i = 0; i < moves.size(); i++)
+	{	
+		if(board->checkMove(moves[i], player_side))
 		{
-			Move *move = new Move(x,y);
-			if(board->checkMove(move, player_side))
+			Board *temp = board->copy();
+			temp -> doMove(moves[i], player_side);
+			if (temp-> count(player_side) - temp -> count(opponent_side) > score)
 			{
-				Board *temp = board->copy();
-				temp -> doMove(move, player_side);
-				if (temp-> count(player_side) - temp -> count(opponent_side) > score)
-				{
-					best_move = move;
-					score = temp->count(player_side) - temp->count(opponent_side);
-					delete temp;
-				}
-				else
-				{
-					delete move;
-					delete temp;
-				}
+				delete best_move;
+				best_move = moves[i];
+				score = temp->count(player_side) - temp->count(opponent_side);
 			}
+			else
+			{
+				delete moves[i];
+			}
+			delete temp;
 		}
 	}
 	
