@@ -26,6 +26,7 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
+	delete board;
 }
 
 /*
@@ -42,7 +43,7 @@ vector<Move *> Player::validMoves(Board board, Side side) {
 		for(int x = 0; x < 8; x++)
 		{
 			Move *move = new Move(x,y);
-			if(board->checkMove(move, player_side))
+			if(board.checkMove(move, side))
 			{
 				result.push_back(move);
 			}
@@ -50,6 +51,20 @@ vector<Move *> Player::validMoves(Board board, Side side) {
 	}
 	return result;
 }
+
+// 2-ply minimax
+int worst_score;
+int best_score;
+vector <Move *> validMoves1 = validMoves(board, side);
+for (int i = 0; i < validMoves1.size(); i++)
+{
+	Board *temp = board->copy();
+	vector <Move *> validMoves2 = validMoves(temp, side);
+	for (int i = 0; i < validMoves2.size(); i++)
+	{
+		temp->doMove(, side);
+		//check score
+	
 
 
 /*
