@@ -375,7 +375,7 @@ double Player::compute_squares(Side player_side, Side opp_side, Board *temp)
 	return squares;
 }
 
-double Player::compute_score2(Board *temp, Side player_side) //new function being implemented for score, still in progress
+double Player::compute_score2(Board *temp, Side player_side)
 {
 	double score = 0.0;
 	Side opp_side;
@@ -420,18 +420,7 @@ tuple<double, Move> Player::minimax_ab(Board* current, int depth, bool player, d
 	// Base case
 	if (depth == 0 || validMoves1.empty() == true)
 	{
-		//string key = current->get_board_string();
 		double score;
-		/*
-		if (memo.count(key) > 0)
-		{
-			score = memo[key];
-		}
-		else
-		{
-			score = compute_score2(current, player_side);
-			memo[key] = score;
-		}*/
 		score = compute_score2(current, player_side);
 		tuple <double, Move> result (score, Move (-1,-1));
 		return result;
@@ -509,7 +498,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-	
+    
+    int plies = 8;
+
+
 	Move *best_move = new Move (-1, -1);
 	
 	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
@@ -526,9 +518,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		delete best_move;
 		return NULL;
 	}
-	//memo_type memo;
 	
-	tuple <double, Move> result = minimax_ab(board, 6, true, -9999999.0, 9999999.0);
+	tuple <double, Move> result = minimax_ab(board, plies, true, -9999999.0, 9999999.0);
 	*best_move = get<1> (result);
 	
 	board->doMove(best_move, player_side);
