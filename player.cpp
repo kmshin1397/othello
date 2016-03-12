@@ -266,72 +266,28 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-	//if(using_minimax || testingMinimax)
-	//{
 	
-		Move *best_move = new Move (-1, -1);
-		
-		board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
-		
-		if (board->countBlack() == 2 && board->countWhite() == 2 && player_side == BLACK)
-		{
-			Move *first_move = new Move(3, 2);
-			board->doMove(first_move, player_side);
-			delete best_move;
-			return first_move;
-		}
-		if (!(board->hasMoves(player_side)))
-		{
-			delete best_move;
-			return NULL;
-		}
-		//memo_type memo;
-		
-		tuple <double, Move> result = minimax_ab(board, 7, true, -9999999.0, 9999999.0);
-		*best_move = get<1> (result);
-		
-		board->doMove(best_move, player_side);
-		return best_move;
-	//}
-	/*
-	else
+	Move *best_move = new Move (-1, -1);
+	
+	board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
+	
+	if (board->countBlack() == 2 && board->countWhite() == 2 && player_side == BLACK)
 	{
-		int best_score = -10000000;
-		Move *best_move = NULL;
-		Side opponent_side = BLACK;
-		if (player_side == BLACK) //Sets computer color
-		{
-			opponent_side = WHITE;
-		}		
-		board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
-		
-		vector<Move *> moves = validMoves(board, player_side);
-		
-		for(unsigned int i = 0; i < moves.size(); i++)
-		{
-			if(board->checkMove(moves[i], player_side))
-			{
-				int score = compute_score2(board, player_side, moves[i]);
-				if (score > best_score)
-				{
-					delete best_move;
-					best_move = moves[i];
-					best_score = score;
-				}
-				else
-				{
-					delete moves[i];
-				}
-			
-			}
-		}
-		
-		if (best_score != -10000000)
-		{
-			board->doMove(best_move, player_side);
-			return best_move;
-		}
-		
+		Move *first_move = new Move(3, 2);
+		board->doMove(first_move, player_side);
+		delete best_move;
+		return first_move;
+	}
+	if (!(board->hasMoves(player_side)))
+	{
+		delete best_move;
 		return NULL;
-	}*/
+	}
+	//memo_type memo;
+	
+	tuple <double, Move> result = minimax_ab(board, 7, true, -9999999.0, 9999999.0);
+	*best_move = get<1> (result);
+	
+	board->doMove(best_move, player_side);
+	return best_move;
 }
