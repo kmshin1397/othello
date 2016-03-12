@@ -35,6 +35,7 @@ bool Board::occupied(int x, int y) {
 bool Board::get(Side side, int x, int y) {
     return occupied(x, y) && (black[x + 8*y] == (side == BLACK));
 }
+	
 
 void Board::set(Side side, int x, int y) {
     taken.set(x + 8*y);
@@ -178,3 +179,21 @@ void Board::setBoard(char data[]) {
         }
     }
 }
+
+string Board::get_board_string() {
+	static char data[64];
+    for (int i = 0; i < 64; i++) {
+        if (black[i]) {
+            data[i] = 'b';
+        } else if (taken[i] && !(black[i])) {
+            data[i] = 'w';
+        }
+        else {
+			data[i] = ' ';
+		}
+    }
+    
+    string result (data);
+    return result;
+}
+

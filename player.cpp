@@ -13,6 +13,13 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
     player_side = side;
+    
+    opponent_side = BLACK;
+	if (side == BLACK) //Sets computer color
+	{
+		opponent_side = WHITE;
+	}	
+	
 	Board *new_board = new Board();
 	board = new_board;
 	using_minimax = true;
@@ -38,14 +45,14 @@ Player::~Player() {
  * param: current Board board
  * param: Side side of player whose turn it is
  */
-vector<Move *> Player::validMoves(Board *input_board, Side side) {
-	vector<Move *> result;
+vector<Move> Player::validMoves(Board *input_board, Side side) {
+	vector<Move> result;
 	for(int y = 0; y < 8; y++)
 	{
 		for(int x = 0; x < 8; x++)
 		{
-			Move *move = new Move(x,y);
-			if(input_board->checkMove(move, side))
+			Move move = Move(x,y);
+			if(input_board->checkMove(&move, side))
 			{
 				result.push_back(move);
 			}
@@ -54,88 +61,11 @@ vector<Move *> Player::validMoves(Board *input_board, Side side) {
 	return result;
 }
 
-int Player::compute_score(Board *input_board, Side side, Move *move)
+double Player::compute_score2(Board *temp, Side player_side)
 {
-	int score = 0;
-	Board *temp = input_board->copy();
-	temp -> doMove(move, side);
-	if(side == BLACK)
-	{
-		score = temp->countBlack() - temp->countWhite();
-	}
-	else
-	{
-		score = temp->countWhite() - temp->countBlack();
-	}
-	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
-	{
-		score += 5;	
-	}
-	/*else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
-		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
-	{
-		score -= 2;
-	}
-	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
-	{
-		score -= 4;	
-	}
-	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
-	{
-		score += 2;
-	}*/
-	
-	delete temp;
-	return score;
-}
-
-
-int Player::compute_score_ply2(Board *input_board, Side side, Move *move)
-{
-	int score = 0;
-	Side opponent_side = BLACK;
-	if (side == BLACK) //Sets computer color
-	{
-		opponent_side = WHITE;
-	}	
-	Board *temp = input_board->copy();
-	temp -> doMove(move, opponent_side);
-	if(side == BLACK)
-	{
-		score = temp->countBlack() - temp->countWhite();
-	}
-	else
-	{
-		score = temp->countWhite() - temp->countBlack();
-	}
-	if((move->getX() == 0 || move->getX() == 7) && (move->getY() == 0 || move->getY() == 7))
-	{
-		score -= 5;	
-	}
-	else if(((move->getX() == 0 || move->getX() == 7) && (move->getY() == 1 || move->getY() == 6))
-		||  ((move->getY() == 0 || move->getY() == 7) && (move->getX() == 1 || move->getX() == 6)))
-	{
-		score += 2;
-	}
-	if((move->getX() == 1 || move->getX() == 6) && (move->getY() == 1 || move->getY() == 6))
-	{
-		score += 4;	
-	}
-	else if((move->getX() == 0 || move->getX() == 7) || (move->getY() == 0 || move->getY() == 7))
-	{
-		score -= 2;
-	}
-	
-	delete temp;
-	return score;
-}
-
-
-int Player::compute_score2(Board *input_board, Side player_side, Move *move)
-{
-	int score = 0;
-	Board *temp = input_board->copy();
-	temp -> doMove(move, player_side);
+	double score = 0;
+	//Board *temp = input_board->copy();
+	//temp -> doMove(move, player_side);
 	Side opp_side;
 	
 	if(player_side == BLACK)
@@ -226,102 +156,95 @@ int Player::compute_score2(Board *input_board, Side player_side, Move *move)
 	}*/
 	
 	score = 10 * piece_diff + 801.724 * corner_occ;
-	delete temp;
+	//delete temp;
 	return score;
 }
 
-
-
-int Player::simple_score(Board *input_board, Side side, Move *move)
+tuple<double, Move> Player::minimax_ab(Board* current, int depth, bool player, double a, double b)
 {
-	int score = 0;
-	
-	Board *temp = input_board->copy();
-	temp->doMove(move, side);
-	if(side == BLACK)
+	Side side;                                                                                                             
+	if (player)
 	{
-		score = temp->countBlack() - temp->countWhite();
-		
+		side = player_side;
 	}
 	else
 	{
-		score = temp->countWhite() - temp->countBlack();
+		side = opponent_side;
 	}
+	// Get children of node
+	vector <Move> validMoves1 = validMoves(current, side);
 	
-	
-	delete temp;
-	return score;
-}
-
-
-Move *Player::minimax()
-{
-	Side opponent_side = BLACK;
-	if (player_side == BLACK) //Sets computer color
+	// Base case
+	if (depth == 0 || validMoves1.empty() == true)
 	{
-		opponent_side = WHITE;
-	}	
-	// 2-ply minimax
-	int max_min;
-	unsigned int best_move = 0;
+		//string key = current->get_board_string();
+		double score;
+		/*
+		if (memo.count(key) > 0)
+		{
+			score = memo[key];
+		}
+		else
+		{
+			score = compute_score2(current, player_side);
+			memo[key] = score;
+		}*/
+		score = compute_score2(current, player_side);
+		tuple <double, Move> result (score, Move (-1,-1));
+		return result;
+	}
 
-	vector <int> min_gains;
-
-	//for every valid move
-	vector <Move *> validMoves1 = validMoves(board, player_side);
+	double best_score;
+	if (player)
+	{
+		best_score = -9999999;
+	}
+	else
+	{
+		best_score = 9999999;
+	}
+	Move best_move (-1, -1);
+		
 	for (unsigned int i = 0; i < validMoves1.size(); i++)
 	{
-		int min_gain = 9999999;
-		Board *temp = board->copy();
-		temp->doMove(validMoves1[i], player_side);
 		
-		//for every valid move from valid move
-		vector <Move *> validMoves2 = validMoves(temp, opponent_side);
-		for (unsigned int j = 0; j < validMoves2.size(); j++)
+		Board *temp = current->copy();
+		temp->doMove(&(validMoves1[i]), side);
+		
+		if (player)
 		{
-			//check score
-			int score;
-			if(testingMinimax)
+			tuple <double, Move> child = minimax_ab(temp, depth - 1, false, a, b);
+			if (get<0>(child) > best_score)
 			{
-				score = -1*simple_score(temp, opponent_side, validMoves2[j]) ;
+				best_move = validMoves1[i];
+				best_score = get<0>(child);
 			}
-			else
+			a = max(best_score, a);
+			if (b <= a)
 			{
-				score = compute_score_ply2(temp, player_side, validMoves2[j]) ;
+				delete temp;
+				break;
 			}
-			if (score < min_gain)
-			{
-				min_gain = score;
-			}
-			delete validMoves2[j];
 		}
-		// Record minimum gain of each branch
-		min_gains.push_back(min_gain);
-		
+		else
+		{
+			tuple <double, Move> child = minimax_ab(temp, depth - 1, true, a, b);
+			if (get<0>(child) <  best_score)
+			{
+				best_move = validMoves1[i];	
+				best_score = get<0>(child);	
+			}
+			b = min(best_score, b);
+			if (b <= a)
+			{
+				delete temp;
+				break;
+			}
+		}
 		delete temp;
 	}
-
-	// Find maximum min gain
-	max_min = min_gains[0];
-
-	for (unsigned int l = 0; l < min_gains.size(); l++)
-	{
-
-		if (min_gains[l] > max_min)
-		{
-			max_min = min_gains[l];
-			best_move = l;
-		}
-	}
-	
-	for (unsigned int i = 0; i < validMoves1.size(); i++)
-	{
-		if (i != best_move)
-		{
-			delete validMoves1[i];
-		}
-	}
-	return validMoves1[best_move];
+	tuple <double, Move> result (best_score, best_move);
+	return result;
 }
 
 /*
@@ -343,28 +266,34 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-	if(using_minimax || testingMinimax)
-	{
-		Move *best_move = NULL;
-		Side opponent_side = BLACK;
-		if (player_side == BLACK) //Sets computer color
-		{
-			opponent_side = WHITE;
-		}		
+	//if(using_minimax || testingMinimax)
+	//{
+	
+		Move *best_move = new Move (-1, -1);
 		
 		board->doMove(opponentsMove, opponent_side); //Updates board with opponents moves
 		
-		vector<Move *> moves = validMoves(board, player_side);
-		if (moves.size() == 0)
+		if (board->countBlack() == 2 && board->countWhite() == 2 && player_side == BLACK)
 		{
+			Move *first_move = new Move(3, 2);
+			board->doMove(first_move, player_side);
+			delete best_move;
+			return first_move;
+		}
+		if (!(board->hasMoves(player_side)))
+		{
+			delete best_move;
 			return NULL;
 		}
+		//memo_type memo;
 		
-		best_move = minimax();
+		tuple <double, Move> result = minimax_ab(board, 7, true, -9999999.0, 9999999.0);
+		*best_move = get<1> (result);
 		
 		board->doMove(best_move, player_side);
 		return best_move;
-	}
+	//}
+	/*
 	else
 	{
 		int best_score = -10000000;
@@ -404,6 +333,5 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		}
 		
 		return NULL;
-	}
+	}*/
 }
-
