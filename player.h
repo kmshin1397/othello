@@ -23,8 +23,14 @@ public:
 	
 	int compute_score(Board *input_board, Side side, Move *move);
 	int compute_score_ply2(Board *input_board, Side side, Move *move);
-	int compute_score2(Board *input_board, Side side, Move *move);
+	double compute_score2(Board *input_board, Side side, Move *move);
 	int simple_score(Board *input_board, Side side, Move *move);
+	double compute_piece_diff(Side player_side, Side opp_side, Board *temp);
+	double compute_corner_occ(Side player_side, Side opp_side, Board *temp);
+	double compute_corner_adj(Side player_side, Side opp_side, Board *temp);
+	double compute_mobility(Side player_side, Side opp_side, Board *temp);
+	double compute_frontiers(Side player_side, Side opp_side, Board *temp);
+	double compute_squares(Side player_side, Side opp_side, Board *temp);
 	
 	Move *minimax();
 	
