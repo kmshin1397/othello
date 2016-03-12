@@ -1,5 +1,5 @@
 CC          = g++
-CFLAGS      = -Wall -ansi -pedantic -ggdb
+CFLAGS      = -Wall -ansi -pedantic -O3 -std=c++11
 OBJS        = player.o board.o
 PLAYERNAME  = Swerve
 
